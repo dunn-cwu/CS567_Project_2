@@ -68,3 +68,7 @@ summary(FitAll)
 
 # Do backwards elimination of columns (Eliminates non-significant columns)
 step(FitAll, direction = "backward")
+
+fitTopTwo <- lm(Estimated.Total.Cost ~ Structures.threatened + Resources.assigned..personnel., data=sdata)
+
+plot(fitTopTwo)
