@@ -1,3 +1,4 @@
+# Paul's First Example
 # setwd("~/projects/CS567_Project_2")
 # setwd("C:/Users/Coder/OneDrive/Documents/CS 567 Computational Stats/CS567_Project_2")
 
