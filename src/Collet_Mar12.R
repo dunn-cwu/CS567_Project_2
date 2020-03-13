@@ -53,25 +53,42 @@ data = subset(data, select=-c(County, Cause, Fire.Name, Date.Start, Date.contain
 data$Size..acres. <- as.numeric(gsub(",","",data$Size..acres.))
 data$Estimated.Total.Cost <- as.numeric(gsub(",","",data$Estimated.Total.Cost))
 
+data<-na.omit(data) 
+
 # Make sure all columns are numeric
-data <- sapply(data, as.numeric, na.rm=TRUE) 
+data <- as.data.frame(sapply(data, as.numeric))
 
 # NOTE: the na.rm=TRUE, above, takes care of the evacuations that occured be is NA
 # However, when sapply is used here it increments the values in Evacuations (assuming we care if normalized)
 
 #View(data)
 
+sdata = subset(data, select=-c(Estimated.Total.Cost))
 # Standardize all columns
-sdata = as.data.frame(scale(data))
+sdata = as.data.frame(scale(sdata))
+sdata = cbind(sdata,  subset(data, select=c(Estimated.Total.Cost)))
 
 # View standardized dataframe
 #View(sdata)
 
 # Backwards Elimination Example Used From:
 # https://www.youtube.com/watch?v=0aTtMJO-pE4
-FitAll <- lm(Estimated.Total.Cost ~ . , data=sdata, na.action=na.exclude)
+FitAll <- lm(Estimated.Total.Cost ~ . , data=sdata)
 
 #summary(FitAll)
 
 # Do backwards elimination of columns (Eliminates non-significant columns)
 step(FitAll, direction = "backward")
+
+selData = sdata[c("Estimated.Total.Cost","Resources.assigned..personnel.", "Structures.lost", "Lewis", "Deaths", "Injuries..Responders.",
+                  "Ferry", "Chelan", "Whatcom", "X..of.Evacuated", "Okanogan", "Lincoln", "Spokane", "Douglas", "Benton", "Year", "King",
+                  "Size..acres.", "Structures.threatened", "Timber", "Yakima", "U")]
+
+index <- sample(1:nrow(selData), 0.8*nrow(selData))
+train_df <- selData[index, ]
+test_df  <- selData[-index, ]
+
+model <- lm(Estimated.Total.Cost ~ ., data=train_df)
+
+pred.int <- predict(model, test_df, interval = "confidence")
+print(pred.int)
