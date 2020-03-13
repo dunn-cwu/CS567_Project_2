@@ -1,4 +1,5 @@
 library(plyr)
+library(stringr)
 library(standardize)
 library(ggplot2)
 
@@ -58,16 +59,15 @@ df <- as.data.frame(sapply(df, as.numeric))
 # sapply caused 0s and 1s on evacuations to become 1s and 2s
 df$Evacuations <- df$Evacuations - 1
 
-# normalizing select columns
+# normalize/standardize
 normalize <- function(x) {
   return ((x - min(x)) / (max(x) - min(x)))
 }
 
-df$Size..acres. <- normalize(df$Size..acres.)
-df$Structures.threatened <- normalize(df$Structures.threatened)
-df$X..of.Evacuated <- normalize(df$X..of.Evacuated)
-df$Resources.assigned..personnel. <- normalize(df$Resources.assigned..personnel.)
-df$Duration <- normalize(df$Duration)
+#df <- normalize(df)
+df[1:2] <- as.data.frame(scale(df[1:2]))
+df[6:12] <- as.data.frame(scale(df[6:12]))
+df[14] <- as.data.frame(scale(df[14]))
 
 # split into train and test sets
 index <- sample(1:nrow(df), 0.8*nrow(df))
@@ -79,12 +79,16 @@ lm_model <- lm(Estimated.Total.Cost ~ ., data=train_df)
 summary <- summary(lm_model)
 
 # run step-wise selection
-step <- step(lm_model, direction = "backward")
+step <- step(lm_model, direction = "forward")
 
 # update model with recommended call
-lm_model <- lm(Estimated.Total.Cost ~ Year + Grass + Timber + Structures.damaged + 
-                 Structures.threatened + Injuries..Responders. + X..of.Evacuated + 
-                 Whitman + Asotin + Grant + Stevens + H + U, data=train_df)
+lm_model <- lm(Estimated.Total.Cost ~ Year + Size..acres. + Grass + Brush + 
+                 Timber + Structures.lost + Structures.damaged + Structures.threatened + 
+                 Injuries..Responders. + Evacuations + X..of.Evacuated + Resources.assigned..personnel. + 
+                 Duration + Spokane + Whitman + Okanogan + Whatcom + Chelan + 
+                 "Walla Walla" + Yakima + Douglas + Klickitat + Lincoln + 
+                 Ferry + Asotin + Snohomish + Grant + Stevens + Lewis + Benton + 
+                 Franklin + "Pend Oreille" + King + Kittitas + H + U + L, data=train_df)
 
 # predictions
 cost_pred <- predict(lm_model, test_df) # highest run so far was 82.4%
