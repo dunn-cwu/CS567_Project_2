@@ -4,6 +4,7 @@
 library(plyr)
 library(standardize)
 library(stringr)
+library(ggplot2)
 
 # data cleaning
 data = read.csv("./dat/Wildfires_WA_dataset.csv", header = TRUE)
@@ -92,3 +93,15 @@ model <- lm(Estimated.Total.Cost ~ ., data=train_df)
 
 pred.int <- predict(model, test_df, interval = "confidence")
 print(pred.int)
+
+pred.df <- cbind(test_df, pred.int)
+pred.df$rid <- as.numeric(row.names(pred.df))
+
+pd <- position_dodge(0.1)
+
+ggplot(pred.df, aes(x=rid, y=Estimated.Total.Cost, group=1)) + 
+  geom_errorbar(aes(ymin=lwr, ymax=upr), colour="black", width=.1, position=pd) +
+  geom_line(position=pd, color="blue", size=1) +
+  geom_point(position=pd, size=3) +
+  geom_line(aes(x=rid, y=fit, group=2), color="red", size=1)
+
