@@ -8,6 +8,7 @@ library(standardize)
 library(stringr)
 library(ggplot2)
 library(scales)
+library(dvmisc)
 
 # Set seed used for random sampling
 SAMPLE_SEED <- 8
@@ -73,6 +74,8 @@ sdata = cbind(sdata,  subset(data, select = c(Estimated.Total.Cost)))
 # intial model with all columns
 fit_all <- lm(Estimated.Total.Cost ~ ., data = sdata)
 
+elimTypes = data.frame(Types = c("Backwards", "Forwards", "Both"), MSE = c(0, 0, 0))
+
 ## backward elimination ##
 #step(fit_all, direction = "backward")
 
@@ -83,11 +86,12 @@ sel_data = sdata[c("Estimated.Total.Cost","Resources.assigned..personnel.", "Str
 # Set seed used in random number generator
 set.seed(SAMPLE_SEED)
 
-index <- sample(1:nrow(sel_data), 0.8*nrow(sel_data))
+index <- sample(1:nrow(sel_data), 0.8 * nrow(sel_data))
 train_df <- sel_data[index, ]
 test_df  <- sel_data[-index, ]
 
 model <- lm(Estimated.Total.Cost ~ ., data = train_df)
+elimTypes$MSE[1] <- get_mse(model)
 
 pred_int <- predict(model, test_df, interval = "confidence")
 pred_df <- cbind(test_df, pred_int)
@@ -124,11 +128,12 @@ sel_data = sdata[c("Estimated.Total.Cost","Year", "Size..acres.", "Grass", "Brus
 # Set seed used in random number generator
 set.seed(SAMPLE_SEED)
 
-index <- sample(1:nrow(sel_data), 0.8*nrow(sel_data))
+index <- sample(1:nrow(sel_data), 0.8 * nrow(sel_data))
 train_df <- sel_data[index, ]
 test_df  <- sel_data[-index, ]
 
 model <- lm(Estimated.Total.Cost ~ ., data = train_df)
+elimTypes$MSE[2] <- get_mse(model)
 
 pred_int <- predict(model, test_df, interval = "confidence")
 pred_df <- cbind(test_df, pred_int)
@@ -163,13 +168,15 @@ sel_data = sdata[c("Estimated.Total.Cost","Year", "Timber", "Structures.lost", "
 # Set seed used in random number generator
 set.seed(SAMPLE_SEED)
 
-index <- sample(1:nrow(sel_data), 0.8*nrow(sel_data))
+index <- sample(1:nrow(sel_data), 0.8 * nrow(sel_data))
 train_df <- sel_data[index, ]
 test_df  <- sel_data[-index, ]
 
 model <- lm(Estimated.Total.Cost ~ ., data = train_df)
+elimTypes$MSE[3] <- get_mse(model)
 
 pred_int <- predict(model, test_df, interval = "confidence")
+
 pred_df <- cbind(test_df, pred_int)
 pred_df$rid <- as.numeric(row.names(pred_df))
 
@@ -191,4 +198,8 @@ plot_both <- ggplot(pred_df, aes(x = rid, y = Estimated.Total.Cost)) +
 
 ggsave("out/dual_elim.pdf", units = "in", width = 10, height = 10, dpi = 300)
 
+# A bargraph of Mean Squared Error
+mse_compare <- ggplot(data = elimTypes, aes(x = Types, y = MSE / 100000000000)) + geom_bar(stat="identity")
+
+ggsave("out/squared_error.pdf", units = "in", width = 10, height = 10, dpi = 300)
 
