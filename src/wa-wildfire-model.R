@@ -7,6 +7,9 @@ library(standardize)
 library(stringr)
 library(ggplot2)
 
+# Set seed used for random sampling
+SAMPLE_SEED <- 8
+
 # data cleaning
 data = read.csv("./dat/Wildfires_WA_dataset.csv", header = TRUE)
 
@@ -75,6 +78,9 @@ sel_data = sdata[c("Estimated.Total.Cost","Resources.assigned..personnel.", "Str
                   "Ferry", "Chelan", "Whatcom", "X..of.Evacuated", "Okanogan", "Lincoln", "Spokane", "Douglas", "Benton", "Year", "King",
                   "Size..acres.", "Structures.threatened", "Timber", "Yakima", "U")]
 
+# Set seed used in random number generator
+set.seed(SAMPLE_SEED)
+
 index <- sample(1:nrow(sel_data), 0.8*nrow(sel_data))
 train_df <- sel_data[index, ]
 test_df  <- sel_data[-index, ]
@@ -106,6 +112,9 @@ sel_data = sdata[c("Estimated.Total.Cost","Year", "Size..acres.", "Grass", "Brus
                         "Klickitat", "Lincoln", "Ferry", "Asotin", "Snohomish", "Grant", "Stevens", "Lewis", "Benton", 
                         "Franklin", "Pend Oreille", "King", "Kittitas", "H", "U", "L")]
 
+# Set seed used in random number generator
+set.seed(SAMPLE_SEED)
+
 index <- sample(1:nrow(sel_data), 0.8*nrow(sel_data))
 train_df <- sel_data[index, ]
 test_df  <- sel_data[-index, ]
@@ -134,6 +143,9 @@ sel_data = sdata[c("Estimated.Total.Cost","Year", "Timber", "Structures.lost", "
                         "X..of.Evacuated", "Resources.assigned..personnel.", "Spokane", "Okanogan", 
                         "Whatcom", "Chelan", "Douglas", "Lincoln", "Ferry", "Lewis", "Benton",
                         "Kittitas", "U")]
+
+# Set seed used in random number generator
+set.seed(SAMPLE_SEED)
 
 index <- sample(1:nrow(sel_data), 0.8*nrow(sel_data))
 train_df <- sel_data[index, ]
