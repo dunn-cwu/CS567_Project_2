@@ -1,3 +1,4 @@
+
 # setwd("~/projects/CS567_Project_2")
 # setwd("C:/Users/Coder/OneDrive/Documents/CS 567 Computational Stats/CS567_Project_2")
 
@@ -75,8 +76,8 @@ fit_all <- lm(Estimated.Total.Cost ~ ., data = sdata)
 #step(fit_all, direction = "backward")
 
 sel_data = sdata[c("Estimated.Total.Cost","Resources.assigned..personnel.", "Structures.lost", "Lewis", "Deaths", "Injuries..Responders.",
-                  "Ferry", "Chelan", "Whatcom", "X..of.Evacuated", "Okanogan", "Lincoln", "Spokane", "Douglas", "Benton", "Year", "King",
-                  "Size..acres.", "Structures.threatened", "Timber", "Yakima", "U")]
+                   "Ferry", "Chelan", "Whatcom", "X..of.Evacuated", "Okanogan", "Lincoln", "Spokane", "Douglas", "Benton", "Year", "King",
+                   "Size..acres.", "Structures.threatened", "Timber", "Yakima", "U")]
 
 # Set seed used in random number generator
 set.seed(SAMPLE_SEED)
@@ -95,22 +96,28 @@ pd <- position_dodge(0.1)
 
 plot_backward <- ggplot(pred_df, aes(x = rid, y = Estimated.Total.Cost)) + 
   geom_errorbar(aes(ymin = lwr, ymax = upr), colour = "black", width = .1, position = pd) +
-  geom_line(position = pd, color = "blue", size = 1.25) +
-  geom_point(position = pd, size = 2, color = "blue") +
-  geom_line(aes(x = rid, y = fit), color = "red", size = 1.25) +
-  geom_point(aes(x = rid, y = fit), size = 2, color = "red") + 
+  
+  geom_line( position = pd, size = 1.25, aes(color = "Actual")) +
+  geom_point(position = pd, size = 2,    aes(color = "Actual")) +
+  
+  geom_line( aes(x = rid, y = fit, color = "Predicted"), size = 1.25) +
+  geom_point(aes(x = rid, y = fit, color = "Predicted"), size = 2) + 
+  
+  scale_color_manual(values = c("Actual" = "blue", "Predicted" = "red")) +
+  theme(legend.title=element_blank(), legend.justification = c(1,1), legend.position = c(1,1), text = element_text(size = 20)) +
   labs(title = "Model Accuracy with Backward Elimination", y = "Estimated Cost ($)", x = "Data Row")
-ggsave("out/back_elim.pdf", units = "in", width = 10, height = 5, dpi = 300)
+
+ggsave("out/back_elim.pdf", units = "in", width = 10, height = 10, dpi = 300)
 
 ## forward elimination ##
 #step(fit_all, direction = "forward")
 
 sel_data = sdata[c("Estimated.Total.Cost","Year", "Size..acres.", "Grass", "Brush", "Timber",
-                        "Structures.lost", "Structures.damaged", "Structures.threatened", "Deaths", "Injuries..Responders.", 
-                        "Injuries..civilians.", "Evacuations", "X..of.Evacuated", "Resources.assigned..personnel.", 
-                        "duration", "Spokane", "Whitman", "Okanogan", "Whatcom", "Chelan", "Walla Walla", "Yakima", "Douglas", 
-                        "Klickitat", "Lincoln", "Ferry", "Asotin", "Snohomish", "Grant", "Stevens", "Lewis", "Benton", 
-                        "Franklin", "Pend Oreille", "King", "Kittitas", "H", "U", "L")]
+                   "Structures.lost", "Structures.damaged", "Structures.threatened", "Deaths", "Injuries..Responders.", 
+                   "Injuries..civilians.", "Evacuations", "X..of.Evacuated", "Resources.assigned..personnel.", 
+                   "duration", "Spokane", "Whitman", "Okanogan", "Whatcom", "Chelan", "Walla Walla", "Yakima", "Douglas", 
+                   "Klickitat", "Lincoln", "Ferry", "Asotin", "Snohomish", "Grant", "Stevens", "Lewis", "Benton", 
+                   "Franklin", "Pend Oreille", "King", "Kittitas", "H", "U", "L")]
 
 # Set seed used in random number generator
 set.seed(SAMPLE_SEED)
@@ -129,20 +136,26 @@ pd <- position_dodge(0.1)
 
 plot_forward <- ggplot(pred_df, aes(x = rid, y = Estimated.Total.Cost)) + 
   geom_errorbar(aes(ymin = lwr, ymax = upr), colour = "black", width = .1, position = pd) +
-  geom_line(position = pd, color = "blue", size = 1.25) +
-  geom_point(position = pd, size = 2, color = "blue") +
-  geom_line(aes(x = rid, y = fit), color = "red", size = 1.25) +
-  geom_point(aes(x = rid, y = fit), size = 2, color = "red") + 
-  labs(title = "Model Accuracy with Forward Elimination", y = "Estimated Cost ($)", x = "Data Row")
-ggsave("out/for_elim.pdf", units = "in", width = 10, height = 5, dpi = 300)
+  
+  geom_line( position = pd, size = 1.25, aes(color = "Actual")) +
+  geom_point(position = pd, size = 2,    aes(color = "Actual")) +
+  
+  geom_line( aes(x = rid, y = fit, color = "Predicted"), size = 1.25) +
+  geom_point(aes(x = rid, y = fit, color = "Predicted"), size = 2) + 
+  
+  scale_color_manual(values = c("Actual" = "blue", "Predicted" = "red")) +
+  theme(legend.title=element_blank(), legend.justification = c(1,1), legend.position = c(1,1), text = element_text(size = 20)) +
+  labs(title = "Model Accuracy with Backward Elimination", y = "Estimated Cost ($)", x = "Data Row")
+
+ggsave("out/for_elim.pdf", units = "in", width = 10, height = 10, dpi = 300)
 
 ## Both ##
 #step(fit_all, direction = "both")
 
 sel_data = sdata[c("Estimated.Total.Cost","Year", "Timber", "Structures.lost", "Deaths", "Injuries..Responders.",
-                        "X..of.Evacuated", "Resources.assigned..personnel.", "Spokane", "Okanogan", 
-                        "Whatcom", "Chelan", "Douglas", "Lincoln", "Ferry", "Lewis", "Benton",
-                        "Kittitas", "U")]
+                   "X..of.Evacuated", "Resources.assigned..personnel.", "Spokane", "Okanogan", 
+                   "Whatcom", "Chelan", "Douglas", "Lincoln", "Ferry", "Lewis", "Benton",
+                   "Kittitas", "U")]
 
 # Set seed used in random number generator
 set.seed(SAMPLE_SEED)
@@ -161,10 +174,17 @@ pd <- position_dodge(0.1)
 
 plot_both <- ggplot(pred_df, aes(x = rid, y = Estimated.Total.Cost)) + 
   geom_errorbar(aes(ymin = lwr, ymax = upr), colour = "black", width = .1, position = pd) +
-  geom_line(position = pd, color = "blue", size = 1.25) +
-  geom_point(position = pd, size = 2, color = "blue") +
-  geom_line(aes(x = rid, y = fit), color = "red", size = 1.25) +
-  geom_point(aes(x = rid, y = fit), size = 2, color = "red") + 
-  labs(title = "Model Accuracy with Dual Elimination", y = "Estimated Cost ($)", x = "Data Row")
-ggsave("out/dual_elim.pdf", units = "in", width = 10, height = 5, dpi = 300)
+  
+  geom_line( position = pd, size = 1.25, aes(color = "Actual")) +
+  geom_point(position = pd, size = 2,    aes(color = "Actual")) +
+  
+  geom_line( aes(x = rid, y = fit, color = "Predicted"), size = 1.25) +
+  geom_point(aes(x = rid, y = fit, color = "Predicted"), size = 2) + 
+  
+  scale_color_manual(values = c("Actual" = "blue", "Predicted" = "red")) +
+  theme(legend.title=element_blank(), legend.justification = c(1,1), legend.position = c(1,1), text = element_text(size = 20)) +
+  labs(title = "Model Accuracy with Backward Elimination", y = "Estimated Cost ($)", x = "Data Row")
+
+ggsave("out/dual_elim.pdf", units = "in", width = 10, height = 10, dpi = 300)
+
 
