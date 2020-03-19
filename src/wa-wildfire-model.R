@@ -7,6 +7,7 @@ library(reshape2)
 library(standardize)
 library(stringr)
 library(ggplot2)
+library(scales)
 
 # Set seed used for random sampling
 SAMPLE_SEED <- 8
@@ -95,6 +96,7 @@ pred_df$rid <- as.numeric(row.names(pred_df))
 pd <- position_dodge(0.1)
 
 plot_backward <- ggplot(pred_df, aes(x = rid, y = Estimated.Total.Cost)) + 
+  scale_y_continuous(labels = comma) +
   geom_errorbar(aes(ymin = lwr, ymax = upr), colour = "black", width = .1, position = pd) +
   
   geom_line( position = pd, size = 1.25, aes(color = "Actual")) +
@@ -134,7 +136,8 @@ pred_df$rid <- as.numeric(row.names(pred_df))
 
 pd <- position_dodge(0.1)
 
-plot_forward <- ggplot(pred_df, aes(x = rid, y = Estimated.Total.Cost)) + 
+plot_forward <- ggplot(pred_df, aes(x = rid, y = Estimated.Total.Cost)) +
+  scale_y_continuous(labels = comma) +
   geom_errorbar(aes(ymin = lwr, ymax = upr), colour = "black", width = .1, position = pd) +
   
   geom_line( position = pd, size = 1.25, aes(color = "Actual")) +
@@ -145,7 +148,7 @@ plot_forward <- ggplot(pred_df, aes(x = rid, y = Estimated.Total.Cost)) +
   
   scale_color_manual(values = c("Actual" = "blue", "Predicted" = "red")) +
   theme(legend.title=element_blank(), legend.justification = c(1,1), legend.position = c(1,1), text = element_text(size = 20)) +
-  labs(title = "Model Accuracy with Backward Elimination", y = "Estimated Cost ($)", x = "Data Row")
+  labs(title = "Model Accuracy with Forward Elimination", y = "Estimated Cost ($)", x = "Data Row")
 
 ggsave("out/for_elim.pdf", units = "in", width = 10, height = 10, dpi = 300)
 
@@ -173,6 +176,7 @@ pred_df$rid <- as.numeric(row.names(pred_df))
 pd <- position_dodge(0.1)
 
 plot_both <- ggplot(pred_df, aes(x = rid, y = Estimated.Total.Cost)) + 
+  scale_y_continuous(labels = comma) +
   geom_errorbar(aes(ymin = lwr, ymax = upr), colour = "black", width = .1, position = pd) +
   
   geom_line( position = pd, size = 1.25, aes(color = "Actual")) +
@@ -183,7 +187,7 @@ plot_both <- ggplot(pred_df, aes(x = rid, y = Estimated.Total.Cost)) +
   
   scale_color_manual(values = c("Actual" = "blue", "Predicted" = "red")) +
   theme(legend.title=element_blank(), legend.justification = c(1,1), legend.position = c(1,1), text = element_text(size = 20)) +
-  labs(title = "Model Accuracy with Backward Elimination", y = "Estimated Cost ($)", x = "Data Row")
+  labs(title = "Model Accuracy with Bidirectional Elimination", y = "Estimated Cost ($)", x = "Data Row")
 
 ggsave("out/dual_elim.pdf", units = "in", width = 10, height = 10, dpi = 300)
 
