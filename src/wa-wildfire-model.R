@@ -199,7 +199,10 @@ plot_both <- ggplot(pred_df, aes(x = rid, y = Estimated.Total.Cost)) +
 ggsave("out/dual_elim.pdf", units = "in", width = 10, height = 10, dpi = 300)
 
 # A bargraph of Mean Squared Error
-mse_compare <- ggplot(data = elimTypes, aes(x = Types, y = MSE / 100000000000)) + geom_bar(stat="identity")
+mse_compare <- ggplot(data = elimTypes, aes(x = Types, y = MSE / 100000000000, fill = Types)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Model Accuracies", y = "MSE (per 100T)", x = "Elimination Types") +
+  theme(text = element_text(size = 14), legend.position = "none")
 
 ggsave("out/squared_error.pdf", units = "in", width = 10, height = 10, dpi = 300)
 
